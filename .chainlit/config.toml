@@ -114,7 +114,7 @@ reaction_on_message_received = false
 
 [UI]
 # Name of the assistant.
-name = "Assistant"
+name = "Libra"
 
 # default_theme = "dark"
 
