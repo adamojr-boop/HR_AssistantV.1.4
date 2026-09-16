@@ -12,7 +12,7 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 @cl.on_chat_start
 async def start():
-    """Inizializza la chat inviando i pulsanti di gestione del database."""
+    """Inizializza la chat inviando i pulsanti di gestione del database tramite il System Assistant."""
     actions = [
         Action(
             name="db_stats",
@@ -36,9 +36,11 @@ async def start():
             payload={}
         ),
     ]
+    
     await cl.Message(
-        content="**Informazioni del sistema:**", 
-        actions=actions
+        content="⚙️ **Informazioni del sistema:**", 
+        actions=actions,
+        author="system_assistant"
     ).send()
 
 @cl.action_callback("db_stats")
@@ -46,25 +48,37 @@ async def on_db_stats(action: Action):
     """Mostra le statistiche attuali del database ChromaDB."""
     collection = db.get_collection()
     count = collection.count() if collection else 0
-    await cl.Message(content=f"📊 **Statistiche Database:** Il database contiene attualmente `{count}` chunk indicizzati.").send()
+    await cl.Message(
+        content=f"📊 **Statistiche Database:** Il database contiene attualmente `{count}` chunk indicizzati.",
+        author="system_assistant"
+    ).send()
 
 @cl.action_callback("db_reindex")
 async def on_db_reindex(action: Action):
     """Sincronizza/reindicizza i file presenti nella cartella resumes."""
     processor.sync_documents()
-    await cl.Message(content="🔄 **Reindex completato:** La cartella resumes è stata sincronizzata con successo nel database.").send()
+    await cl.Message(
+        content="🔄 **Reindex completato:** La cartella resumes è stata sincronizzata con successo nel database.",
+        author="system_assistant"
+    ).send()
 
 @cl.action_callback("db_clear")
 async def on_db_clear(action: Action):
     """Svuota completamente la collezione del database."""
     db.delete_collection()
-    await cl.Message(content="🗑️ **Database svuotato:** L'intera collezione è stata eliminata. È necessario lanciare il reindex per ricaricare i file.").send()
+    await cl.Message(
+        content="🗑️ **Database svuotato:** L'intera collezione è stata eliminata. È necessario lanciare il reindex per ricaricare i file.",
+        author="system_assistant"
+    ).send()
 
 @cl.on_message
 async def main(message: cl.Message):
-    """Gestisce i messaggi di chat dell'utente effettuando la ricerca RAG su ChromaDB."""
+    """Gestisce i messaggi di chat dell'utente effettuando la ricerca RAG su ChromaDB con l'HR Assistant."""
     
-    msg = cl.Message(content="🔍 Sto cercando nei documenti e formulando la risposta...")
+    msg = cl.Message(
+        content="🔍 Sto cercando nei documenti e formulando la risposta...",
+        author="hr_assistant"
+    )
     await msg.send()
 
     user_query = message.content
@@ -72,7 +86,7 @@ async def main(message: cl.Message):
     collection = db.get_collection()
     results = collection.query(
         query_texts=[user_query],
-        n_results=10
+        n_results=12
     )
     
     retrieved_chunks = results.get("documents", [[]])[0]
@@ -111,6 +125,5 @@ Domanda: {user_query}
     answer = response.choices[0].message.content
 
     msg.content = answer
+    msg.author = "hr_assistant"
     await msg.update()
-    
-#poetry run chainlit run app.py -w ---> Avvia L'app in Chainlit con interfaccia web
