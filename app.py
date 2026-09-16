@@ -2,8 +2,8 @@ import os
 import chainlit as cl
 from chainlit.action import Action
 from openai import OpenAI
-from assistant3.database import Database
-from assistant3.document_processor import DocumentProcessor
+from assistant.database import Database
+from assistant.document_processor import DocumentProcessor
 
 db = Database()
 processor = DocumentProcessor(db)
@@ -112,3 +112,5 @@ Domanda: {user_query}
 
     msg.content = answer
     await msg.update()
+    
+#poetry run chainlit run app.py -w ---> Avvia L'app in Chainlit con interfaccia web
