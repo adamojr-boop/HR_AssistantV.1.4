@@ -38,7 +38,7 @@ async def start():
     ]
     
     await cl.Message(
-        content="⚙️ **Informazioni del sistema:**", 
+        content="**Informazioni del sistema:**", 
         actions=actions,
         author="system_assistant"
     ).send()
