@@ -1,0 +1,20 @@
+Luca Bianchi
+Email: luca.bianchi@email.com | Tel: +39 335 5554321
+
+PROFILO PROFESSIONALE
+Frontend Developer orientato all'esperienza utente e alle performance web. Specializzato in React, TypeScript e moderni framework CSS. Ottime capacità di collaborazione in team Agile/Scrum.
+
+ESPERIENZA LAVORATIVA
+- Frontend Developer presso Pixel Studio (2020 - Presente)
+  * Sviluppo di Single Page Applications (SPA) scalabili utilizzando React, Redux Toolkit e TypeScript.
+  * Ottimizzazione delle performance frontend e integrazione di design system aziendali.
+- Web Designer Junior presso Creative Agency (2018 - 2020)
+  * Realizzazione di interfacce web responsive con HTML5, CSS3 e JavaScript vanilla.
+
+COMPETENZE TECNICHE
+- Linguaggi: JavaScript (ES6+), TypeScript, HTML5, CSS3/Sass
+- Framework: React, Next.js, Tailwind CSS
+- Strumenti: Git, Webpack, Figma, Jest
+
+ISTRUZIONE
+Diploma in Grafica e Comunicazione - ITIS G. Marconi (2018)

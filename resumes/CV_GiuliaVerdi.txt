@@ -1,0 +1,20 @@
+Giulia Verdi
+Email: giulia.verdi@email.com | Tel: +39 334 9876543
+
+PROFILO PROFESSIONALE
+Data Scientist e AI Engineer con un forte background statistico. Esperta nello sviluppo di modelli di Machine Learning, Natural Language Processing (NLP) e integrazione di Large Language Models (LLM) tramite API OpenAI e framework RAG.
+
+ESPERIENZA LAVORATIVA
+- AI Specialist presso DataMinds Lab (2021 - Presente)
+  * Progettazione e sviluppo di sistemi di ricerca semantica e RAG utilizzando ChromaDB, LangChain e OpenAI.
+  * Analisi predittiva e pulizia di grandi dataset aziendali con Pandas e Scikit-Learn.
+- Data Analyst presso Retail Insights (2018 - 2021)
+  * Creazione di dashboard di visualizzazione dati con Tableau e reportistica aziendale.
+
+COMPETENZE TECNICHE
+- Linguaggi: Python, R, SQL
+- Framework & Librerie: LangChain, ChromaDB, PyTorch, Pandas, Scikit-Learn
+- Cloud & Tool: AWS, Docker, Jupyter Notebooks
+
+ISTRUZIONE
+Laurea Magistrale in Data Science - Università Bocconi di Milano (2018)
