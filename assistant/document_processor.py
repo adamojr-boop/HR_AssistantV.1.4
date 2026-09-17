@@ -17,7 +17,7 @@ def calculate_file_hash(file_path: Path) -> str:
 class DocumentProcessor:
     def __init__(self, db: Database):
         self.collection = db.get_collection()
-        self.md_converter = MarkItDown()  # <-- Inizializzi il convertitore
+        self.md_converter = MarkItDown()
 
     @staticmethod
     def get_document_metadata(file_path: str, file_hash: str) -> dict:
@@ -37,8 +37,7 @@ class DocumentProcessor:
             RESUMES_DIR.mkdir(parents=True, exist_ok=True)
             print(f"[DEBUG] Cartella creata, ma è vuota.")
             return
-        
-        # Estensioni supportate (puoi aggiungere .pdf, .docx, ecc.)
+        # Estensioni supportate
         supported_extensions = {".txt", ".pdf", ".docx", ".pptx", ".xlsx"}
         
         local_files = {
@@ -82,19 +81,17 @@ class DocumentProcessor:
         for filename in files_to_remove:
             ids_to_delete = file_to_chunk_ids.get(filename, [])
             if ids_to_delete:
-                self.collection.get_or_create_collection().delete(ids=ids_to_delete) # o self.collection.delete a seconda del setup
+                self.collection.delete(ids=ids_to_delete)
 
         files_to_add = added_files.union(updated_files)
         for filename in files_to_add:
             file_path = local_files[filename]
             current_hash = calculate_file_hash(file_path)
             
-            # --- Lettura tramite MarkItDown anziché semplice open() ---
             if file_path.suffix.lower() == ".txt":
                 with open(file_path, "r", encoding="utf-8") as f:
                     content = f.read()
             else:
-                # Conversione automatica da PDF, Word, ecc. a Markdown/Testo
                 result = self.md_converter.convert(str(file_path))
                 content = result.text_content
 

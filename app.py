@@ -1,4 +1,5 @@
 import os
+import shutil
 import chainlit as cl
 from chainlit.action import Action
 from openai import OpenAI
@@ -73,26 +74,77 @@ async def on_db_clear(action: Action):
 
 @cl.on_message
 async def main(message: cl.Message):
-    """Gestisce i messaggi di chat dell'utente effettuando la ricerca RAG su ChromaDB con l'HR Assistant."""
+    """Gestisce i messaggi di chat dell'utente e gli eventuali file allegati."""
     
+    if message.elements:
+        processing_msg = cl.Message(
+            content="📁 Ho rilevato un file allegato. Lo sto elaborando e aggiungendo al database...",
+            author="hr_assistant"
+        )
+        await processing_msg.send()
+        
+        for file in message.elements:
+            try:
+                target_path = os.path.join("resumes", file.name)
+                os.makedirs("resumes", exist_ok=True)
+                shutil.copy(file.path, target_path)
+                
+                processor.sync_documents()
+                
+                processing_msg.content = f"✅ Il file **{file.name}** è stato caricato e indicizzato con successo nel database! Ora puoi chiedermi informazioni su questo candidato."
+                await processing_msg.update()
+                return
+            except Exception as e:
+                processing_msg.content = f"❌ Errore durante l'elaborazione del file: {str(e)}"
+                await processing_msg.update()
+                return
+
     msg = cl.Message(
-        content="🔍 Sto cercando nei documenti e formulando la risposta...",
+        content="Sto cercando nei documenti e formulando la risposta...",
         author="hr_assistant"
     )
     await msg.send()
 
     user_query = message.content
+    query_lower = user_query.lower()
 
     collection = db.get_collection()
-    results = collection.query(
-        query_texts=[user_query],
-        n_results=12
-    )
-    
-    retrieved_chunks = results.get("documents", [[]])[0]
-    context = "\n\n".join(retrieved_chunks) if retrieved_chunks else "Nessun documento rilevante trovato."
 
-    prompt = f"""
+    if any(keyword in query_lower for keyword in ["elenco", "quanti profili", "tutti i candidati", "lista"]):
+        all_data = collection.get(include=["metadatas", "documents"])
+        metadatas = all_data.get("metadatas", [])
+        documents = all_data.get("documents", [])
+        
+        unique_sources = set()
+        for meta in metadatas:
+            if meta and "source" in meta:
+                unique_sources.add(meta["source"])
+                
+        context = f"Candidati totali nel database: {len(unique_sources)}\nFile registrati: {list(unique_sources)}\n\n" + "\n\n--- DOCUMENTO ---\n\n".join(documents)
+
+        prompt = f"""
+Sei un assistente HR. L'utente sta chiedendo una panoramica generale e l'elenco completo dei candidati presenti nel database.
+
+Regole:
+1. Elenca TUTTI i candidati trovati nei documenti e nei file di origine.
+2. Indica chiaramente il numero totale dei profili disponibili.
+3. Per ciascun candidato, fornisci nome, cognome e una sintesi rapida delle sue competenze principali.
+
+Contesto:
+{context}
+
+Domanda: {user_query}
+"""
+
+    else:
+        results = collection.query(
+            query_texts=[user_query],
+            n_results=12
+        )
+        retrieved_chunks = results.get("documents", [[]])[0]
+        context = "\n\n".join(retrieved_chunks) if retrieved_chunks else "Nessun documento rilevante trovato."
+
+        prompt = f"""
 Sei un assistente HR esperto, preciso e rigoroso. 
 Analizza il contesto dei curriculum forniti per rispondere alla domanda dell'utente.
 
